@@ -1,7 +1,7 @@
 import os
 import pathlib
 import json
-import re
+
 from PIL import Image
 
 size_parametr = (100, 100)
@@ -19,21 +19,21 @@ for folder in folders:
         image_of_dog_name = image.split(".")[0]
         for dog in dog_data_base[image_of_dog_name]:
             file_name = dog["name"]
-            sizes = []
-            for size in dog["bndbox"].values():
-                size = int(size)
-                sizes.append(size)
-            width = sizes[2] - sizes[0]
-            height = sizes[3] - sizes[1]
+            xmin = int(dog["bndbox"]["xmin"])
+            ymin = int(dog["bndbox"]["ymin"])
+            xmax = int(dog["bndbox"]["xmax"])
+            ymax = int(dog["bndbox"]["ymax"])
+            width = xmax - xmin
+            height = ymax - ymin
             if width < height:
-                croped_image = image_of_dog.crop(
-                    (sizes[0], sizes[1], sizes[2], sizes[1] + width)
-                )
+                croped_image = image_of_dog.crop((xmin, ymin, xmax, width + ymin))
             else:
-                croped_image = image_of_dog.crop(
-                    (sizes[0], sizes[1], sizes[0] + height, sizes[3])
-                )
+                croped_image = image_of_dog.crop((xmin, ymin, xmin + height, ymax))
             ready_image = croped_image.convert("L")
+            if ready_image.width < 100 or ready_image.height < 100:
+                ready_image = ready_image.resize((100, 100))
+            if ready_image.width < 100 or ready_image.height < 100:
+                ready_image.show()
             ready_image.thumbnail(size_parametr)
             ready_image.save(
                 "C:/Users/Akshei/Desktop/projekt_pjeski/ready_images/"
