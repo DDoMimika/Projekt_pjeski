@@ -2,3 +2,9 @@ archive.zip
 images
 annotations
 ready_images
+inputs.npy
+outputs.npy
+history.json
+weight.ckpt.index
+weight.ckpt_temp/part-00000-of-00001.data-00000-of-00001
+weight.ckpt_temp/part-00000-of-00001.index
