@@ -7,20 +7,23 @@ from model import get_model
 from tensorflow import keras
 from tensorflow.keras import layers, losses
 from tensorflow.keras.models import Sequential
+from prepare_outputs_and_inputs import get_array_of_names as array_names
+import random
 
 file_name = "weight.ckpt"
 train_input = np.load("./inputs.npy")
 train_output = np.load("./outputs.npy")
-train = (
-    tf.data.Dataset.from_tensor_slices((train_input[0:20000], train_output[0:20000]))
-    .batch(64)
-    .shuffle(64)
-)
-test = tf.data.Dataset.from_tensor_slices(
-    (train_input[20000:], train_output[20000:])
-).batch(64)
 IMAGE_SIZE = 100
-
+np.random.seed(67)
+np.random.shuffle(train_input)
+np.random.seed(67)
+np.random.shuffle(train_input)
+train = tf.data.Dataset.from_tensor_slices(
+    (train_input[:17701], train_output[:17701])
+).batch(64)
+test = tf.data.Dataset.from_tensor_slices(
+    (train_input[17701:], train_output[17701:])
+).batch(64)
 model = get_model()
 model.build()
 model.summary()
@@ -38,8 +41,6 @@ ckpt = tf.train.Checkpoint()
 if tf.train.latest_checkpoint(checkpoint_path) != None:
     ckpt_path = tf.train.latest_checkpoint(checkpoint_path)
     ckpt.restore(ckpt_path)
-else:
-    model.load_weights("weight.ckpt")
 
 history = model.fit(train, epochs=100, callbacks=[cp_callback])
 json_history = json.dumps(history.history)

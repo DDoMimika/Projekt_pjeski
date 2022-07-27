@@ -28,7 +28,7 @@ def get_array_of_names():
 
 
 if __name__ == "__main__":
-    for image in folder:
+    for i, image in enumerate(folder):
         image_of_dog = Image.open(path / image)
         info = image_of_dog.getdata()
         info = np.reshape(np.array(info), (100, 100, 1))
@@ -37,6 +37,7 @@ if __name__ == "__main__":
         name = get_name_from_filename(image)
         array_answer[get_array_of_names().index(name)] = 1
         array_of_ansers.append(array_answer)
+        print(i)
     np_array_images = np.array(array_images, dtype=int8)
     np_array_names = np.array(array_of_ansers)
     save("inputs.npy", np_array_images)
