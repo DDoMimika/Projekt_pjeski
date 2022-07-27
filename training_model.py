@@ -33,11 +33,14 @@ model.compile(
 cp_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath=file_name, save_weights_only=True, verbose=1
 )
-checkpoint_path = "./projekt_pjeski/weight.ckt"
+checkpoint_path = "./projekt_pjeski"
 ckpt = tf.train.Checkpoint()
 if tf.train.latest_checkpoint(checkpoint_path) != None:
     ckpt_path = tf.train.latest_checkpoint(checkpoint_path)
     ckpt.restore(ckpt_path)
+else:
+    model.load_weights("weight.ckpt")
+
 history = model.fit(train, epochs=100, callbacks=[cp_callback])
 json_history = json.dumps(history.history)
 with open("history.json", "w") as file_to_write:
