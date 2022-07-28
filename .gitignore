@@ -10,3 +10,4 @@ weight.ckpt.data-00000-of-00001
 weight.ckpt_temp/part-00000-of-00001.index
 __pycache__
 checkpoint
+checkpoints

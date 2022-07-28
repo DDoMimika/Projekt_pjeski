@@ -7,16 +7,15 @@ from model import get_model
 from tensorflow import keras
 from tensorflow.keras import layers, losses
 from tensorflow.keras.models import Sequential
-from prepare_outputs_and_inputs import get_array_of_names as array_names
-import random
+from pathlib import Path
 
-file_name = "weight.ckpt"
+file_name = "./checkpoints/{loss}"
 train_input = np.load("./inputs.npy")
 train_output = np.load("./outputs.npy")
 IMAGE_SIZE = 100
-np.random.seed(67)
+np.random.seed(8008)
 np.random.shuffle(train_input)
-np.random.seed(67)
+np.random.seed(8008)
 np.random.shuffle(train_input)
 train = tf.data.Dataset.from_tensor_slices(
     (train_input[:17701], train_output[:17701])
@@ -36,13 +35,10 @@ model.compile(
 cp_callback = tf.keras.callbacks.ModelCheckpoint(
     filepath=file_name, save_weights_only=True, verbose=1
 )
-checkpoint_path = "./projekt_pjeski"
-ckpt = tf.train.Checkpoint()
+checkpoint_path = "./checkpoints"
 if tf.train.latest_checkpoint(checkpoint_path) != None:
-    ckpt_path = tf.train.latest_checkpoint(checkpoint_path)
-    ckpt.restore(ckpt_path)
-
-history = model.fit(train, epochs=100, callbacks=[cp_callback])
+    model.load_weights(tf.train.latest_checkpoint(checkpoint_path))
+history = model.fit(train, epochs=2, callbacks=[cp_callback])
 json_history = json.dumps(history.history)
 with open("history.json", "w") as file_to_write:
     file_to_write.write(json_history)
