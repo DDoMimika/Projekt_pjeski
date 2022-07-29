@@ -1,15 +1,11 @@
-import pathlib
 import os
 import re
-from PIL import Image
 import numpy as np
-from numpy import int8, rad2deg, save
+import paths
 
-path = pathlib.Path("./ready_images")
-folder = os.listdir(path)
-array_images = []
-
-array_of_ansers = []
+from PIL import Image
+from numpy import int8, save
+from convert_image import IMG_SIZE
 
 
 def get_name_from_filename(image):
@@ -20,25 +16,36 @@ def get_name_from_filename(image):
 
 def get_array_of_names():
     array_names = []
-    for image in folder:
+    for image in os.listdir(paths.PATH_READY_IMAGES):
         name = get_name_from_filename(image)
         if not name in array_names:
             array_names.append(name)
     return array_names
 
 
+def load_image(image_path):
+    dog_image = Image.open(image_path)
+    pixels = dog_image.getdata()
+    pixels = np.reshape(np.array(pixels), (IMG_SIZE, IMG_SIZE, 1))
+    return pixels
+
+
 if __name__ == "__main__":
-    for i, image in enumerate(folder):
-        image_of_dog = Image.open(path / image)
-        info = image_of_dog.getdata()
-        info = np.reshape(np.array(info), (100, 100, 1))
-        array_images.append(info)
-        array_answer = [0 for i in range(120)]
+
+    images = []
+    answers = []
+    names = get_array_of_names()
+
+    for i, image in enumerate(os.listdir(paths.PATH_READY_IMAGES)):
+
+        pixels = load_image(paths.PATH_READY_IMAGES / image)
+        images.append(pixels)
+
         name = get_name_from_filename(image)
-        array_answer[get_array_of_names().index(name)] = 1
-        array_of_ansers.append(array_answer)
-        print(i)
-    np_array_images = np.array(array_images, dtype=int8)
-    np_array_names = np.array(array_of_ansers)
-    save("inputs.npy", np_array_images)
-    save("outputs.npy", np_array_names)
+        answer = names.index(name)
+        answers.append(answer)
+
+    np_images = np.array(images, dtype=int8)
+    np_names = np.array(answers)
+    save(paths.INPUT_FILENAME, np_images)
+    save(paths.OUTPUT_FILENAME, np_names)

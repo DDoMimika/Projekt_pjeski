@@ -1,9 +1,9 @@
 import os
 import xmltodict
 import json
-import pathlib
+import paths
 
-path = pathlib.Path("./archive/annotations/Annotation")
+path = paths.PATH_ANNOTATIONS
 folders = os.listdir(path)
 data_base = {}
 
@@ -28,5 +28,5 @@ for folder in folders:
                 ]
             data_base[file] = info_dogs
 json_data_base = json.dumps(data_base, indent=4)
-with open("ready_data_base.json", "w") as file_to_write:
-    file_to_write.write(json_data_base)
+with open(paths.READY_DATABASE_FILENAME, "w") as f:
+    f.write(json_data_base)
