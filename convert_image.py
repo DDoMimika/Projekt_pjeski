@@ -1,6 +1,6 @@
 from PIL import Image
 
-IMG_SIZE = 100
+IMG_SIZE = 60
 
 
 def prepare_image(xmin, ymin, xmax, ymax, image):
