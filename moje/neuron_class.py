@@ -32,15 +32,21 @@ class normalizaton_neuron:
 
 class conclusion_neuron:
     def __init__(self, image_size):
-        self.a = np.array([rd.random() for _ in range(image_size+1)])  
-        self.f = np.array([rd.random() for _ in range(image_size+1)])     #a - conclusion parameters
+        self.a = np.array([rd.random() for _ in range(image_size+1)], dtype = float)             # rd.random() zamiast 0.5   
+        self.f = np.array([rd.random() for _ in range(image_size+1)], dtype = float)     # a - conclusion parameters
         self.y = 0
 
     def conclusion(self, image, h):
-        self.f[:len(self.f)-1] = np.multiply(image,h)  #błą image*h
-        self.f[len(self.f)-1] = h
-        s = self.f @ self.a
-        self.y = h*s
+        if True:
+            #print("true")
+            self.f[:len(self.f)-1] = np.multiply(image,h)  
+            self.f[len(self.f)-1] = h
+            s = self.f @ self.a
+            self.y = s
+        else:
+            print("false")
+            s = image @ self.a[:len(self.a)-1] + self.a[len(self.a)-1]
+            self.y = h*s
 
 class result_neuron:
     def __init__(self):

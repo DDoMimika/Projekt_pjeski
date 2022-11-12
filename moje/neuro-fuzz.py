@@ -1,15 +1,11 @@
-# warstwa 1 - pobieranie danych - l. neuronów = image_size; fuzzyfikacja - gauss funkcji - zm.: mean sigma
-# war 2  - normalizacja
-# war 3 - konkluzcja reguł 
-# war 4 - suma konklucji
-
 import numpy as np
 from fuzzy_network_class import *
 
 
-image = [1,2]
-model = fuzzy_network(2,len(image))
-model.work(image)
+images = np.array([[1,2],[2,3],[0.5,1],[0.125,0.25]])
+category_images = np.array([1, 2, 3, 4])
+model = fuzzy_network(2,len(images[0]))
+model.train(images, category_images, 1)
 
 
 
