@@ -4,12 +4,12 @@ import numpy as np
 class fuzzyfication_neuron:
     def __init__(self):
         self.output = 0
-        self.mean = rd.random()
-        self.sigma = rd.random()
+        self.mean = 0
+        self.sigma = 1
 
     def gauss_function(self, x):
         #self.output = x
-        self.output = np.exp(-((x-self.mean)/self.sigma)**2)
+        self.output = np.exp(-(x-self.mean)**2/self.sigma)
 
 class firing_neuron:
     def __init__(self):
@@ -31,22 +31,22 @@ class normalizaton_neuron:
         self.h = h/s
 
 class conclusion_neuron:
-    def __init__(self, image_size):
-        self.a = np.array([rd.random() for _ in range(image_size+1)], dtype = float)             # rd.random() zamiast 0.5   
-        self.f = np.array([rd.random() for _ in range(image_size+1)], dtype = float)     # a - conclusion parameters
+    def __init__(self, data_size):
+        self.a = np.array([rd.uniform(2**(-32),1) for _ in range(data_size+1)], dtype = float)             # rd.random() zamiast 0.5   
+        self.f = np.array([rd.uniform(2**(-32),1) for _ in range(data_size+1)], dtype = float)     # a - conclusion parameters
         self.y = 0
 
-    def conclusion(self, image, h):
-        if True:
-            #print("true")
-            self.f[:len(self.f)-1] = np.multiply(image,h)  
-            self.f[len(self.f)-1] = h
-            s = self.f @ self.a
-            self.y = s
-        else:
-            print("false")
-            s = image @ self.a[:len(self.a)-1] + self.a[len(self.a)-1]
-            self.y = h*s
+    def conclusion(self, data, h):
+        # if True:
+        #print("true")
+        self.f[:len(self.f)-1] = np.multiply(data,h)  
+        self.f[len(self.f)-1] = h
+        s = self.f @ self.a
+        self.y = s
+        # else:
+        #     print("false")
+        #     s = image @ self.a[:len(self.a)-1] + self.a[len(self.a)-1]
+        #     self.y = h*s
 
 class result_neuron:
     def __init__(self):
