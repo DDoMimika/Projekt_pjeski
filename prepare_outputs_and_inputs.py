@@ -41,10 +41,11 @@ if __name__ == "__main__":
         pixels = load_image(paths.PATH_READY_IMAGES / image)
         images.append(pixels)
 
-        name = get_name_from_filename(image)
-        answer = names.index(name)
-        answers.append(answer)
+        if image.split("_")[0].lower() =="cat":
 
+            answers.append(0)
+        else:
+            answers.append(1)
     np_images = np.array(images, dtype=int8)
     np_names = np.array(answers)
     save(paths.INPUT_FILENAME, np_images)

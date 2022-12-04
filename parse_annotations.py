@@ -2,7 +2,7 @@ import os
 import xmltodict
 import json
 import paths
-
+# nie używamy aktualnie
 path = paths.PATH_ANNOTATIONS
 folders = os.listdir(path)
 data_base = {}

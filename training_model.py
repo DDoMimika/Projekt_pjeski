@@ -1,3 +1,4 @@
+from keras.utils.np_utils import to_categorical
 import tensorflow as tf
 import json
 import paths
@@ -5,12 +6,12 @@ import paths
 from genericpath import exists
 from pickletools import optimize
 from tensorflow import keras
-from tensorflow.keras import layers, losses
-from tensorflow.keras.models import Sequential
+from keras import layers, losses
+from keras.models import Sequential
 from model import get_model
 from prepare_dataset import prepare_dataset
 
-EPOCHS = 1
+EPOCHS = 8
 
 
 def load_model(checkpoint):
@@ -26,7 +27,7 @@ if __name__ == "__main__":
     model.summary()
     model.compile(
         optimizer="adam",
-        loss=losses.SparseCategoricalCrossentropy(from_logits=True),
+        loss=losses.CategoricalCrossentropy(from_logits=True),
         metrics=["accuracy"],
     )
 
@@ -37,8 +38,7 @@ if __name__ == "__main__":
     )
 
     train, test = prepare_dataset()
-
-    history = model.fit(train, epochs=EPOCHS, callbacks=[cp_callback])
+    history = model.fit(train, epochs=EPOCHS,callbacks=[cp_callback])
     json_history = json.dumps(history.history)
 
     with open(paths.HISTORY_FILENAME, "w") as f:

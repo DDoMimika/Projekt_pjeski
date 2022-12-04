@@ -1,14 +1,14 @@
-from tensorflow import keras
-from tensorflow.keras import layers, losses
-from tensorflow.keras.models import Sequential
+from keras import layers
+from keras.models import Sequential
 from convert_image import IMG_SIZE
 
-NUM_CLASSES = 120
+
+NUM_CLASSES = 2
 POOL_SIZE = 2
 
 
 def get_model():
-    model = Sequential(
+    model= Sequential(
         [
             layers.Conv2D(
                 16,
@@ -27,5 +27,6 @@ def get_model():
             layers.Dense(NUM_CLASSES),
         ]
     )
-
+    model.summary()
     return model
+get_model()

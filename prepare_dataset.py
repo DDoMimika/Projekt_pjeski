@@ -3,7 +3,7 @@ import paths
 import tensorflow as tf
 
 SEED = 234
-NUMBER_TRANING = 17701
+NUMBER_TRANING = 17498
 BATCH = 64
 
 
@@ -15,16 +15,11 @@ def prepare_dataset():
     np.random.shuffle(input_data)
     np.random.seed(SEED)
     np.random.shuffle(output_data)
-
-    train = (
-        tf.data.Dataset.from_tensor_slices(
+    
+    train=tf.data.Dataset.from_tensor_slices(
             (input_data[:NUMBER_TRANING], output_data[:NUMBER_TRANING])
-        )
-        .shuffle(len(input_data))
-        .batch(BATCH)
-    )
-
+        ).shuffle(len(input_data)).batch(BATCH)
     test = tf.data.Dataset.from_tensor_slices(
         (input_data[NUMBER_TRANING:], output_data[NUMBER_TRANING:])
-    ).batch(BATCH)
+    ).shuffle(len(input_data)).batch(BATCH)
     return train, test
