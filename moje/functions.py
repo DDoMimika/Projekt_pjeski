@@ -4,7 +4,7 @@ import pandas as pd
 
 SEED = 234
 #NUMBER_TRANING = 17701
-NUMBER_TRANING = 40
+NUMBER_TRANING = 17701
 IMAGE_SIZE = 60
 CLASS_SIZE = 120
 
@@ -35,13 +35,22 @@ def prepare_sets():
     #return (train_input_out, train_output)
     return (train_input_out, train_output), (test_input_out, test_output)
 
-# def funkcja(train_input, train_outpout):
-#     seria = pd.DataFrame(np.concatenate((train_input,np.array([train_outpout]).T), axis=1))
-#     s = seria.loc[seria[IMAGE_SIZE*IMAGE_SIZE] == 73][0].mean()
-#     print("srednia: ",s)
-#     print(seria)
+def funkcja(train_input, train_outpout):
+    seria = pd.DataFrame(np.concatenate((train_input,np.array([train_outpout]).T), axis=1))
+    s = seria.loc[seria[IMAGE_SIZE*IMAGE_SIZE] == 73][0].mean()
+    print("srednia: ",s)
+    print(seria)
 
 # sets = prepare_sets()
-# print(sets[0][1])
-# print(sets[0][0][0])
+# # print(sets[0][1])
+# # print(sets[0][0][0])
 # funkcja(sets[0][0], sets[0][1])
+
+def values():
+    par = np.load(paths.PATH_PARAMETERS)
+    for p in range(len(par)):
+        if par[p][0] == 'nan' or par[p][1] == 'nan':
+            print(f"nan na pozycji {p}")
+    print(par)
+
+#values()

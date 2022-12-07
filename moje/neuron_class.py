@@ -9,7 +9,7 @@ class fuzzyfication_neuron:
 
     def gauss_function(self, x):
         #self.output = x
-        self.output = np.exp(-(x-self.mean)**2/self.sigma)
+        self.output = np.exp(-(x-self.mean)**2/(2*self.sigma))
 
 class firing_neuron:
     def __init__(self):

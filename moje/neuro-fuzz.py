@@ -10,9 +10,9 @@ sets = prepare_sets()
 # category_images = np.array([1, 2, 3, 4])
 model = fuzzy_network(CLASS_SIZE,IMAGE_SIZE*IMAGE_SIZE)
 print("Stworzono siec")
-model.pre_train(sets[0][0],sets[0][1])
+model.pre_train(sets[0][0],sets[0][1], from_file = False)
 print("Przed ucznie zakończone")
-model.train(sets[0][0], sets[0][1], 3)
+model.train(sets[0][0], sets[0][1], sets[1][0], sets[1][1], 3)
 
 
 
