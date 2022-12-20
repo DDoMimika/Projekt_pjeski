@@ -11,7 +11,7 @@ from keras.models import Sequential
 from model import get_model
 from prepare_dataset import prepare_dataset
 
-EPOCHS = 8
+EPOCHS = 20
 
 
 def load_model(checkpoint):
@@ -39,10 +39,20 @@ if __name__ == "__main__":
 
     train, test = prepare_dataset()
     history = model.fit(train, epochs=EPOCHS,callbacks=[cp_callback])
-    json_history = json.dumps(history.history)
+    acc = history.history['accuracy']
+    loss = history.history['loss']
+    # json_history = json.dumps(history)
 
-    with open(paths.HISTORY_FILENAME, "w") as f:
-        f.write(json_history)
+    # with open(paths.HISTORY_FILENAME, "w") as f:
+    #     f.write(json_history)
 
-    loss, acc = model.evaluate(test)
-    print(acc)
+    model.evaluate(test)
+
+import matplotlib.pyplot as plt
+
+epochs = EPOCHS
+plt.plot(range(epochs), loss, label='Training loss')
+plt.savefig("loss.png")
+plt.plot(range(epochs), acc, 'bo', label='Training acc')
+plt.savefig("acc.png")
+plt.show()
