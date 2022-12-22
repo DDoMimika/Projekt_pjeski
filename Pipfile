@@ -9,6 +9,7 @@ numpy = "*"
 xmltodict = "*"
 pillow = "*"
 keras = "*"
+matplotlib = "*"
 
 [dev-packages]
 black = "*"
