@@ -8,21 +8,6 @@ from numpy import int8, save
 from convert_image import IMG_SIZE
 
 
-def get_name_from_filename(image):
-    name = image.split(".")[0]
-    name = re.search(r"[A-Za-z_]+", name).group()
-    return name
-
-
-def get_array_of_names():
-    array_names = []
-    for image in os.listdir(paths.PATH_READY_IMAGES):
-        name = get_name_from_filename(image)
-        if not name in array_names:
-            array_names.append(name)
-    return array_names
-
-
 def load_image(image_path):
     dog_image = Image.open(image_path)
     pixels = dog_image.getdata()
@@ -34,7 +19,6 @@ if __name__ == "__main__":
 
     images = []
     answers = []
-    names = get_array_of_names()
 
     for i, image in enumerate(os.listdir(paths.PATH_READY_IMAGES)):
 

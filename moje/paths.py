@@ -6,7 +6,8 @@ PATH_ANNOTATIONS = pathlib.Path("./baza_danych/annotations/Annotation")
 PATH_CHECKPOINT = pathlib.Path("./checkpoints")
 PATH_INPUT = pathlib.Path("./inputs.npy")
 PATH_OUTPUT = pathlib.Path("./outputs.npy")
-PATH_PARAMETERS = pathlib.Path("./parameters.npy")
+PATH_MEM_PARAMETERS = pathlib.Path("./membership_parameters.npy")
+PATH_CON_PARAMETERS = pathlib.Path("./conclusion_parameters.npy")
 
 INPUT_FILENAME = "inputs.npy"
 OUTPUT_FILENAME = "outputs.npy"

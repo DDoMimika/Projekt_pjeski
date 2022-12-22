@@ -1,4 +1,4 @@
-archive.zip
+baza_danych
 images
 annotations
 ready_images
@@ -13,3 +13,4 @@ checkpoint
 checkpoints
 PetImages
 .vs
+testy.py

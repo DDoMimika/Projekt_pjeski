@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import paths
 from neuron_class import *
-from functions import IMAGE_SIZE, CLASS_SIZE
 
 class fuzzy_network:
     def __init__(self, N, data_size):
@@ -19,27 +18,22 @@ class fuzzy_network:
         input_data= np.repeat(data, self.N)
         for i in range(len(self.fuzzyfication_layer)):
             self.fuzzyfication_layer[i].gauss_function(input_data[i])
-            #print(f"fuzzyfication_layer[{i}] = {self.fuzzyfication_layer[i].output}")
 
     def firing_layer_work(self):
         for i in range(len(self.firing_layer)):
             self.firing_layer[i].firing(self.fuzzyfication_layer, i, self.N)
-            #print(f"firing_layer[{i}] = {self.firing_layer[i].h}")
 
     def normalization_layer_work(self):
         for i in range(len(self.normalization_layer)):
             self.normalization_layer[i].normalization(self.firing_layer[i].h, self.firing_layer)
-            #print(f"normalization_layer[{i}] = {self.normalization_layer[i].h}")
 
     def conclusion_layer_work(self,data):
         for i in range(len(self.conclusion_layer)):
             self.conclusion_layer[i].conclusion(data, self.normalization_layer[i].h)
-            #print(f"conclusion_layer[{i}] = {self.conclusion_layer[i].y}")
 
     def result_layer_work(self):
         self.result_layer.outcome(self.conclusion_layer)
         self.net_rasult = self.result_layer.y
-        #print(f"result_layer = {self.result_layer.y}")
 
     def work(self, data):
         self.fuzzyfication_layer_work(data)
@@ -50,94 +44,113 @@ class fuzzy_network:
 
         return self.net_rasult
 
-    def pre_train(self, train_input, train_outpout, from_file = False):
-        if from_file:
-            #f_handle = np.file(paths.PATH_PAREMETRES, 'a')
-            seria = pd.DataFrame(np.concatenate((train_input,np.array([train_outpout]).T), axis=1))
-            parameters = np.ones(self.N*self.data_size*2).reshape(self.N*self.data_size,2)
-            for i in range(self.data_size):
-                for k in range(self.N):
-                    v = seria.loc[seria[self.data_size] == k][i].var()
-                    m = seria.loc[seria[self.data_size] == k][i].mean()
-                    parameters[k+(self.N)*i][0]=m
-                    parameters[k+(self.N)*i][1]=v
-                    self.fuzzyfication_layer[k+(self.N)*i].sigma = v
-                    self.fuzzyfication_layer[k+(self.N)*i].mean = m
+    def membership_parameters_learn(self, train_input, train_outpout,):
+        seria = pd.DataFrame(np.concatenate((train_input,np.array([train_outpout]).T), axis=1))
+        parameters = np.ones(self.N*self.data_size*2).reshape(self.N*self.data_size,2)
+        for i in range(self.data_size):
+            for k in range(self.N):
+                parameters[k+(self.N)*i][1]= seria.loc[seria[self.data_size] == k][i].var()
+                parameters[k+(self.N)*i][0] = seria.loc[seria[self.data_size] == k][i].mean()
+            print(f"{i} pixel nauczony")
+        np.save(paths.PATH_MEM_PARAMETERS, parameters) 
 
-                print(f"{i} pixel nauczony")
-                #print(f"m = {m}, s = {v}")
-            np.save(paths.PATH_PARAMETERS, parameters)
-            #f_handle.close()
-        else:
-            print("jestem")
-            parameters = np.load(paths.PATH_PARAMETERS)
-            print(parameters)
+    def pre_learn(self, train_input, train_output, memebership_from_file = True, conclusion_from_file = True):
+        if memebership_from_file:
+            parameters = np.load(paths.PATH_MEM_PARAMETERS)
             for i in range(self.data_size):
                 for k in range(self.N):
                     self.fuzzyfication_layer[k+(self.N)*i].sigma = parameters[k+(self.N)*i][1]
                     self.fuzzyfication_layer[k+(self.N)*i].mean = parameters[k+(self.N)*i][0]
 
-                print(f"{i} pixel nauczony")
-                #print(f"m = {m}, s = {v}")
-                
+            print("membership_parameters nauczone")
 
-
-    def learning(self, train_set, train_category_set):
-        print("C")
-        C = self.N*(self.data_size+1)
-        print("F")
-        #print("C_len = ",C)
-        F = np.array([0 for _ in range(C*len(train_set))], dtype=float).reshape((len(train_set), C))
-        print("Y")
-        #print("F_init = ", F)
-        Y = np.array([0 for _ in range(len(train_set))], dtype=float)
-        #print("Y_init = ", Y)
-
-        print("uczenie konklucji")
-        for i in range(len(train_set)):
-            self.work(train_set[i])
-            Y[i] = train_category_set[i]
-            #print(f"Y_{i} = ", Y)
-            for k in range(self.N):
-                #print(f"f_{k} = ", self.conclusion_layer[k].f)
-                F[i][(self.data_size+1)*k:(self.data_size+1)*(k+1)]=self.conclusion_layer[k].f
-                #print(f"F_{k} = ", F)
-
-        #print("F = ", F)
-        A = np.linalg.lstsq(F,Y,rcond=None)[0]
-        #print("A = ", A)
-
-        for k in range(self.N):
-            #print("k = ", k)
-            #print("przed: ", self.conclusion_layer[k].a)
-            self.conclusion_layer[k].a = A[(self.N+1)*k:(self.N+1)*(k+1)]
-            #print("po: ", self.conclusion_layer[k].a)
-
-        print("zmiana sigm i średnich")
-        for data in train_set:
-            y = self.work(data)
+        else:
+            seria = pd.DataFrame(np.concatenate((train_input,np.array([train_output]).T), axis=1))
             for i in range(self.data_size):
                 for k in range(self.N):
-                    const_k = self.conclusion_layer[k].y - self.normalization_layer[k].h*y
-                    m= self.fuzzyfication_layer[2*i +k].mean
-                    self.fuzzyfication_layer[2*i +k].mean += 2*(data[i] - m)/(self.fuzzyfication_layer[2*i +k].sigma)**2*const_k
-                    self.fuzzyfication_layer[2*i +k].sigma += 2*(data[i] - m)**2/(self.fuzzyfication_layer[2*i +k].sigma)**3*const_k
+                    self.fuzzyfication_layer[k+(self.N)*i].sigma = seria.loc[seria[self.data_size] == k][i].var()
+                    self.fuzzyfication_layer[k+(self.N)*i].mean = seria.loc[seria[self.data_size] == k][i].mean()
 
-    def train(self, train_set, train_category_set, test_set, test_category_set, epochs, precision = 0.1):
-        for e in range(epochs):
-            print("Zaczęta epoka: ", e+1)
-            self.learning(train_set, train_category_set)
+            print("membership_parameters nauczone")
 
-            print("Zaczęto accuracy")
-            t = 0
-            for i in range(len(test_set)):
-                y = self.work(test_set[i])
-                if y>= test_category_set[i]-precision and y<= test_category_set[i]+precision:
+        if conclusion_from_file:
+            parameters = np.load(paths.PATH_CON_PARAMETERS)
+            for k in range(self.N):
+                self.conclusion_layer[k].a = parameters[k]
+            print("conclusion_parameters nauczone")
+
+        else:
+            C = self.N*(self.data_size+1)
+            F = np.array([0 for _ in range(C*len(train_input))], dtype=float).reshape((len(train_input), C))
+
+            for i in range(len(train_input)):
+                self.work(train_input[i])
+                for k in range(self.N):
+                    F[i][(self.data_size+1)*k:(self.data_size+1)*(k+1)]=self.conclusion_layer[k].f
+
+            A = np.linalg.lstsq(F,train_output,rcond=None)[0]
+            parameters = np.zeros(C).reshape(self.N, self.data_size+1)
+            for k in range(self.N):
+                parameters[k] = A[(self.data_size+1)*k:(self.data_size+1)*(k+1)]
+                self.conclusion_layer[k].a = A[(self.data_size+1)*k:(self.data_size+1)*(k+1)]
+
+            np.save(paths.PATH_CON_PARAMETERS, parameters)
+            print("conclusion_parameters nauczone")
+     
+    def accuracy(self, test_input, test_output, precision):
+        t = 0
+        # print(len(test_input))
+        for i in range(len(test_input)): 
+            # if i %500 == 0: print(i)
+            y = self.work(test_input[i])
+            d=abs(test_output[i]-y)
+            if d<precision:
                     t+=1
-            
-            accuracy = t/len(test_set)
-            print(f"epoch: {e+1}\n  accuracy = {accuracy*100} %")
+        print(f"  accuracy = {t/len(test_input)*100 } %")
+        print(f"  error = {d**2/2}")
 
+    def mi_der_mean(self, m, s, x):
+        y = -(x-m)/s
+        return y
+
+    def mi_der_sigma(self, m, s, x):
+        y = (x-m)**2/(2*s**2)
+        return y
+            
+    def train(self, train_input, train_output, test_input, test_output, epochs, precision = 0.5, mi =0.5):
+        self.pre_learn(train_input, train_output)   # zczytywanie danych z pliku
+        print("Pre_learn")
+        self.accuracy(test_input, test_output, precision)
+       
+        C = self.N*(self.data_size+1)
+        F = np.array([0 for _ in range(C*len(train_input))], dtype=float).reshape((len(train_input), C))
+        
+        for e in range(epochs):
+            print("Epoka: ", e+1)
+            er = 0
+            for n in range(len(train_input)): 
+                y = self.work(train_input[n])
+                er = (y-train_output[n])**2/2
+                # UCZENIE WSTECZNĄ PROPAGACJĄ BŁĘDU WYNIKAJĄCE Z T-NORMY ALGEBRAICZNEJ
+                p = train_output[n]
+                for i in range(self.data_size):
+                    m = self.fuzzyfication_layer[self.N*i +p].mean
+                    s = self.fuzzyfication_layer[self.N*i +p].sigma
+                    self.fuzzyfication_layer[self.N*i +p].mean -= mi*(y - train_output[n])*(self.conclusion_layer[p].y-y*self.normalization_layer[p].h)*self.mi_der_mean(m, s, train_input[n][i])
+                    self.fuzzyfication_layer[self.N*i +p].sigma -= mi*(y - train_output[n])*(self.conclusion_layer[p].y-y*self.normalization_layer[p].h)*self.mi_der_sigma(m, s, train_input[n][i])
+            print("  error = ", er)  
+            # for n in range(57):
+            #     self.work(train_input[n])
+            #     for k in range(self.N):
+            #         F[n][(self.data_size+1)*k:(self.data_size+1)*(k+1)]=self.conclusion_layer[k].f.copy()
+
+            # A = np.linalg.lstsq(F,train_output,rcond=None)[0]
+
+            # for k in range(self.N):
+            #     self.conclusion_layer[k].a = A[(self.data_size+1)*k:(self.data_size+1)*(k+1)].copy()
+
+            self.accuracy(test_input, test_output, precision) 
+        
 
             
         
